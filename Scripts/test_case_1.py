@@ -28,7 +28,7 @@ def NavigateToAutomationPage():
         print('Automation page is not being displayed!')
 
     time.sleep(2)
-    driver.close()
+    driver.quit()
 
 if __name__ == '__main__':
     NavigateToAutomationPage()

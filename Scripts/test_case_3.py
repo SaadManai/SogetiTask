@@ -34,7 +34,7 @@ def VerifyAllLocationsPage():
         driver.switch_to.window(driver.window_handles[0])
 
     time.sleep(2)
-    driver.close()
+    driver.quit()
 
 if __name__ == '__main__':
     VerifyAllLocationsPage()

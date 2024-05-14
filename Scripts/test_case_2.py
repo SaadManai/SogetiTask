@@ -6,9 +6,10 @@ import secrets
 from webdriverInitializer import initialize_driver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-
-def navigateToAutomationPage():
+def SubmitContactForm():
     driver = initialize_driver()
     driver.implicitly_wait(10)
 
@@ -51,21 +52,34 @@ def navigateToAutomationPage():
     message = driver.find_element(By.XPATH, '//label[contains(text(), "Message")]//following-sibling::textarea')
     enterText(message, driver)
 
-    #time.sleep(5)
-    #wait = WebDriverWait(driver, 10)
-    #policyButton = driver.find_element(By.ID, '__field_1239350')
-    #element = wait.until(EC.element_to_be_clickable(policyButton))
-    #element.click()
-    #driver.execute_script("arguments[0].scrollIntoView();", policyButton)
-    #policyButton.click()
-    #ActionChains(driver).move_to_element(policyButton).click().perform()
+    checkbox = WebDriverWait(driver, 10).until(
+        EC.visibility_of_element_located((By.XPATH, "//input[@id='__field_1239350']")))
+    driver.execute_script("arguments[0].click();", checkbox)
 
-    #robotButton = driver.find_element(By.XPATH, '//span[@id="recaptcha-anchor"]')
-    #driver.execute_script("arguments[0].scrollIntoView();", robotButton)
-    #robotButton.click()
+    try:
+        # Wait until the iframe containing the checkbox is present
+        iframe = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//iframe[contains(@title, 'reCAPTCHA')]"))
+        )
 
-    time.sleep(5)
-    driver.close()
+        # Switch to the iframe
+        driver.switch_to.frame(iframe)
+
+        # Locate the checkbox element using XPath
+        checkbox_xpath = '//div[@class="recaptcha-checkbox-border"]'
+        checkbox = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, checkbox_xpath))
+        )
+
+        # Click the checkbox
+        checkbox.click()
+
+        # Switch back to the main content
+        driver.switch_to.default_content()
+
+    finally:
+        time.sleep(2)
+        driver.quit()
 
 def enterText(ele, driver):
     driver.execute_script("arguments[0].scrollIntoView();", ele)
@@ -85,4 +99,4 @@ def generatePhoneNumber():
     return number
 
 if __name__ == '__main__':
-    navigateToAutomationPage()
+    SubmitContactForm()
